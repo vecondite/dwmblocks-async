@@ -8,6 +8,8 @@
 #include "block.h"
 #include "util.h"
 
+#include "sys/time.h"
+
 static unsigned int compute_tick(const block *const blocks,
                                  const unsigned short block_count) {
     unsigned int tick = 0;
@@ -45,12 +47,17 @@ timer timer_new(const block *const blocks, const unsigned short block_count) {
 }
 
 int timer_arm(timer *const timer) {
-    errno = 0;
-    (void)alarm(timer->tick);
+    struct itimerval itv;
 
-    if (errno != 0) {
-        (void)fprintf(stderr, "error: could not arm timer\n");
-        return 1;
+    itv.it_value.tv_sec = timer->tick / 1000;
+    itv.it_value.tv_usec = (timer->tick % 1000) * 1000;
+    
+    itv.it_interval.tv_sec = 0;
+    itv.it_interval.tv_usec = 0;
+
+    if(setitimer(ITIMER_REAL, &itv, NULL) == -1){
+	perror("setitimer");
+	return 1;
     }
 
     // Wrap `time` to the interval [1, reset_value].
