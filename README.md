@@ -5,6 +5,9 @@ design, so it is always responsive. Imagine `i3blocks`, but for `dwm`.
 
 ![A lean config of dwmblocks-async.](preview.png)
 
+## Fork
+This fork replaces the original's second-resolution timer with a millisecond-precision implementation using `setitimer`.
+
 ## Features
 
 - [Modular](#modifying-the-blocks)
